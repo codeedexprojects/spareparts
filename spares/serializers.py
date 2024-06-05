@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from .models import VehicleCategories, brands, partscategory, Address, Top_categories
+
 
 User = get_user_model()
 
@@ -33,3 +35,41 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class VerifyOTPSerializer(serializers.Serializer):
     email = serializers.EmailField()
     otp = serializers.CharField(max_length=4)
+
+class VehicleCategoriesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VehicleCategories
+        fields = '__all__'
+
+class BrandsSerializer(serializers.ModelSerializer):
+    vehicle_Brand = serializers.CharField()
+    is_car = serializers.BooleanField(default=True)
+    class Meta:
+        model = brands
+        fields = '__all__'
+
+class PartsCategorySerializer(serializers.ModelSerializer):
+    parts_Cat = serializers.PrimaryKeyRelatedField(queryset=Top_categories.objects.all())
+    part_image = serializers.ImageField()
+    v_brand = serializers.PrimaryKeyRelatedField(queryset=brands.objects.all())
+    v_category = serializers.PrimaryKeyRelatedField(queryset=VehicleCategories.objects.all())
+    price = serializers.DecimalField(max_digits=10, decimal_places=2, required=True)
+    
+
+    class Meta:
+        model = partscategory
+        fields = '__all__'
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        fields = '__all__'
+
+
+class TopCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Top_categories
+        fields = '__all__'
+        
+

@@ -50,5 +50,44 @@ class User(AbstractBaseUser):
     
 
 class VehicleCategories(models.Model):
-    VehicleCategory = models.CharField(max_length=100,null=True)
+    Vehicle = models.CharField(max_length=100,null=True)
+
+    def __str__(self):
+        return self.vehicle
+
+class brands(models.Model):
+    vehicle_Brand = models.CharField(max_length=100,null=True)
+    vehicle_category = models.ForeignKey(VehicleCategories,on_delete=models.CASCADE)
+    is_car = models.BooleanField(default=True)
+
+class Top_categories(models.Model):
+    Cat_name = models.CharField(max_length=100,null=True,blank=True)
+
+class partscategory(models.Model):
+    v_brand = models.ForeignKey(brands,on_delete=models.CASCADE,null=True)
+    v_category = models.ForeignKey(VehicleCategories,on_delete=models.CASCADE,null=True)
+    parts_Cat = models.ForeignKey(Top_categories, on_delete=models.CASCADE,null=True)
+    part_image = models.ImageField(upload_to='part_images/', null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+
+class Address(models.Model):
+    full_name = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=20)
+    address_line = models.CharField(max_length=255)
+    pincode = models.CharField(max_length=20)
+    state = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+    other_details = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.full_name} - {self.address_line}, {self.city}, {self.state} - {self.pincode}"
+    
+
+
+
+
+
+
 
