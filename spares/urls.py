@@ -45,4 +45,9 @@ urlpatterns = [
     path('Top_categories/', views.TopCategoryListCreateView.as_view(), name='Top_categories_list_create'),
     path('Top_categories/<int:pk>/',views.TopCategoryDetailview.as_view(), name='Top_categories_detail'),
 
+
+#offer products filter
+
+    path('offer_products/<int:is_offer>/',views.PartsFilterbyIsofferView.as_view(), name='offer_products_List')    
+
 ]

@@ -148,6 +148,13 @@ class PartsCategoryList(generics.ListCreateAPIView):
     queryset = partscategory.objects.all()
     serializer_class = PartsCategorySerializer
 
+class PartsFilterbyIsofferView(generics.ListCreateAPIView):
+    serializer_class = PartsCategorySerializer
+
+    def get_queryset(self):
+        is_offer = self.kwargs['is_offer']
+        return partscategory.objects.filter(is_offer=is_offer)
+
 class PartsCategoryDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = partscategory.objects.all()
     serializer_class = PartsCategorySerializer

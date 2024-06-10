@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.core.validators import MaxValueValidator, MinValueValidator
+
 
 
 # Create your models here.
@@ -66,10 +68,14 @@ class Top_categories(models.Model):
 class partscategory(models.Model):
     v_brand = models.ForeignKey(brands,on_delete=models.CASCADE,null=True)
     v_category = models.ForeignKey(VehicleCategories,on_delete=models.CASCADE,null=True)
+    parts_name = models.CharField(max_length=100,null=True,blank=True)
     parts_Cat = models.ForeignKey(Top_categories, on_delete=models.CASCADE,null=True)
     part_image = models.ImageField(upload_to='part_images/', null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    offer_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    is_offer = models.BooleanField(default=False)
+
 
 
 class Address(models.Model):
@@ -83,6 +89,20 @@ class Address(models.Model):
 
     def __str__(self):
         return f"{self.full_name} - {self.address_line}, {self.city}, {self.state} - {self.pincode}"
+    
+class Review(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(partscategory, on_delete=models.CASCADE)
+    rating = models.DecimalField(max_digits=5, decimal_places=1, validators=[MinValueValidator(1.0), MaxValueValidator(5.0)])
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Review by {self.user.username} for {self.product.name}"
+    
+
+
+    
     
 
 
