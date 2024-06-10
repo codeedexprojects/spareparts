@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from .serializers import UserProfileSerializer,VerifyOTPSerializer,VehicleCategoriesSerializer, BrandsSerializer,\
-      PartsCategorySerializer, AddressSerializer, TopCategorySerializer
+      PartsCategorySerializer, AddressSerializer, TopCategorySerializer , ReviewSerializer
 from django.contrib.auth import get_user_model
 import random
 from django.core.mail import send_mail
@@ -14,7 +14,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.exceptions import AuthenticationFailed
 import datetime
 import jwt
-from .models import VehicleCategories,brands,partscategory,Address,Top_categories
+from .models import VehicleCategories,brands,partscategory,Address,Top_categories,Review
 
 
 
@@ -193,3 +193,12 @@ class TopCategoryListCreateView(generics.ListCreateAPIView):
 class TopCategoryDetailview(generics.RetrieveUpdateDestroyAPIView):
     queryset = Top_categories.objects.all()
     serializer_class = TopCategorySerializer
+
+
+class ReviewListCreateView(generics.ListCreateAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer

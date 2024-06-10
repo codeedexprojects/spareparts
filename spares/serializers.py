@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import VehicleCategories, brands, partscategory, Address, Top_categories
+from .models import VehicleCategories, brands, partscategory, Address, Top_categories , Review
 
 
 User = get_user_model()
@@ -72,4 +72,8 @@ class TopCategorySerializer(serializers.ModelSerializer):
         model = Top_categories
         fields = '__all__'
         
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ['id', 'user', 'product', 'rating',  'created_at']
 

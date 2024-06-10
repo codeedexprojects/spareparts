@@ -48,6 +48,11 @@ urlpatterns = [
 
 #offer products filter
 
-    path('offer_products/<int:is_offer>/',views.PartsFilterbyIsofferView.as_view(), name='offer_products_List')    
+    path('offer_products/<int:is_offer>/',views.PartsFilterbyIsofferView.as_view(), name='offer_products_List'),
+
+
+#review LIST CRETAE DELETE
+    path('reviews/', views.ReviewListCreateView.as_view(), name='review-list-create'),
+    path('reviews/<int:pk>/', views.ReviewDetailView.as_view(), name='review-detail'),
 
 ]
