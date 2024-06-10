@@ -75,6 +75,8 @@ class partscategory(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     offer_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     is_offer = models.BooleanField(default=False)
+    product_rating = models.DecimalField(max_digits=5, decimal_places=1, validators=[MinValueValidator(1.0), MaxValueValidator(5.0)], default=1)
+
 
 
 
