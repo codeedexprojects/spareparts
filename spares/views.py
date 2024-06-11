@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from .serializers import UserProfileSerializer,VerifyOTPSerializer,VehicleCategoriesSerializer, BrandsSerializer,\
-      PartsCategorySerializer, AddressSerializer, TopCategorySerializer , ReviewSerializer
+      PartsCategorySerializer, AddressSerializer, TopCategorySerializer , ReviewSerializer , CartSerializer
 from django.contrib.auth import get_user_model
 import random
 from django.core.mail import send_mail
@@ -14,7 +14,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.exceptions import AuthenticationFailed
 import datetime
 import jwt
-from .models import VehicleCategories,brands,partscategory,Address,Top_categories,Review
+from .models import VehicleCategories,brands,partscategory,Address,Top_categories,Review,Cart
 
 
 
@@ -175,6 +175,7 @@ class PartsCategoryFilterByBrand(generics.ListAPIView):
         brand_id = self.kwargs['brand_id']
         return partscategory.objects.filter(v_brand_id=brand_id)
     
+#address   
 
 class AddressListCreateView(generics.ListCreateAPIView):
     queryset = Address.objects.all()
@@ -184,16 +185,19 @@ class AddressDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
 
+#Categories
 
 class TopCategoryListCreateView(generics.ListCreateAPIView):
     queryset = Top_categories.objects.all()
     serializer_class = TopCategorySerializer
 
 
+
 class TopCategoryDetailview(generics.RetrieveUpdateDestroyAPIView):
     queryset = Top_categories.objects.all()
     serializer_class = TopCategorySerializer
 
+#review
 
 class ReviewListCreateView(generics.ListCreateAPIView):
     queryset = Review.objects.all()
@@ -202,3 +206,35 @@ class ReviewListCreateView(generics.ListCreateAPIView):
 class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+
+#cart
+
+class CartListCreateView(generics.ListCreateAPIView):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class CartDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+
+    def get_queryset(self):
+        return Cart.objects.filter(user=self.request.user)
+    
+    
+class PartsCategoryFilterByVehicleType(generics.ListAPIView):
+    serializer_class = PartsCategorySerializer
+
+    def get_queryset(self):
+        is_car = self.kwargs['is_car']
+        return partscategory.objects.filter(v_brand__is_car=is_car)
+    
+class PartsCategoryFilterByTopCategories(generics.ListAPIView):
+    serializer_class = PartsCategorySerializer
+
+    def get_queryset(self):
+        parts_Cat = self.kwargs['parts_Cat']
+        return partscategory.objects.filter(parts_Cat=parts_Cat)
+

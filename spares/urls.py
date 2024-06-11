@@ -55,4 +55,16 @@ urlpatterns = [
     path('reviews/', views.ReviewListCreateView.as_view(), name='review-list-create'),
     path('reviews/<int:pk>/', views.ReviewDetailView.as_view(), name='review-detail'),
 
+#cart
+
+    path('cart/', views.CartListCreateView.as_view(), name='cart-list-create'),
+    path('cart/<int:pk>/', views.CartDetailView.as_view(), name='cart-detail'),
+
+#Filter by car/ike
+
+    path('parts_categories/filter/<int:is_car>/', views.PartsCategoryFilterByVehicleType.as_view(), name='parts_category_filter_by_vehicle_type'),
+
+#Filter by Top-Categories
+
+    path('Top_categories/filter/<int:parts_Cat>/', views.PartsCategoryFilterByTopCategories.as_view(), name='parts_category_filter_by_TOP_Cat'),
 ]
