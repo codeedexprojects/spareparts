@@ -1,11 +1,12 @@
 from django.shortcuts import render
-from rest_framework import generics
+from rest_framework import generics,permissions
 from rest_framework.permissions import AllowAny
 from .serializers import UserProfileSerializer,VerifyOTPSerializer,VehicleCategoriesSerializer, BrandsSerializer,\
-      PartsCategorySerializer, AddressSerializer, TopCategorySerializer , ReviewSerializer , CartSerializer
+      PartsCategorySerializer, AddressSerializer, TopCategorySerializer , ReviewSerializer, CartSerializer  
 from django.contrib.auth import get_user_model
 import random
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status, generics
@@ -209,20 +210,80 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 #cart
 
-class CartListCreateView(generics.ListCreateAPIView):
-    queryset = Cart.objects.all()
-    serializer_class = CartSerializer
+class AddToCartView(APIView):
+    def post(self, request, user_id, product_id):
+        # Get the user and product objects
+        user = get_object_or_404(User, pk=user_id)
+        product = get_object_or_404(partscategory, pk=product_id)
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        # Create or update the cart item
+        cart_item, created = Cart.objects.get_or_create(user=user, product=product)
 
-class CartDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Cart.objects.all()
-    serializer_class = CartSerializer
+        # Update the quantity
+        if not created:
+            cart_item.quantity += 1
+            cart_item.save()
 
-    def get_queryset(self):
-        return Cart.objects.filter(user=self.request.user)
+        # Pass request object to serializer context
+        serializer = CartSerializer(cart_item, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
     
+
+class UserCartView(APIView):
+    def get(self, request, user_id):
+        # Retrieve the cart items of the user
+        cart_items = Cart.objects.filter(user_id=user_id)
+
+        # Calculate the total price for each cart item and the total cart price
+        total_cart_price = 0
+        for cart_item in cart_items:
+            cart_item.total_price = cart_item.quantity * cart_item.product.Offer_Price
+            total_cart_price += cart_item.total_price
+
+        # Serialize the cart items with the total price
+        serializer = CartSerializer(cart_items, context={'request': request}, many=True)
+
+        # Add the total cart price to the response data
+        response_data = {
+            'message': 'Products Retrieved Successfully',
+            'cart_items': serializer.data,
+            'total_cart_price': total_cart_price
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+class UpdateCartView(APIView):
+    def put(self, request, user_id, cart_item_id):
+        cart_item = get_object_or_404(Cart, pk=cart_item_id, user_id=user_id)
+        serializer = CartSerializer(cart_item, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            response_data = {
+            'message': 'Updated Cart Successfully',
+            'status':True
+        }
+
+            return Response(response_data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class DeleteCartItemView(APIView):
+    def delete(self, request, user_id, cart_item_id):
+        cart_item = get_object_or_404(Cart, pk=cart_item_id, user_id=user_id)
+        cart_item.delete()
+        cart_items = Cart.objects.filter(user_id=user_id)
+
+        # Serialize the cart items with their associated product images
+
+        response_data = {
+            'message': 'Removed From Cart Successfully',
+            'status':True
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
+
+ #filter by vehicle & top categories   
     
 class PartsCategoryFilterByVehicleType(generics.ListAPIView):
     serializer_class = PartsCategorySerializer

@@ -79,8 +79,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CartSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()
-    part = serializers.StringRelatedField()
+    user = UserProfileSerializer(read_only=True)
+    part = PartsCategorySerializer()
 
     class Meta:
         model = Cart

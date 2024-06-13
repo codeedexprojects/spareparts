@@ -62,6 +62,7 @@ class VehicleCategories(models.Model):
 class brands(models.Model):
     vehicle_Brand = models.CharField(max_length=100,null=True)
     vehicle_category = models.ForeignKey(VehicleCategories,on_delete=models.CASCADE)
+    Brand_logo = models.ImageField(upload_to='part_images/', null=True, blank=True)
     is_car = models.BooleanField(default=True)
 
 class Top_categories(models.Model):
@@ -105,7 +106,7 @@ class Review(models.Model):
     
 
 class Cart(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     part = models.ForeignKey(partscategory, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
