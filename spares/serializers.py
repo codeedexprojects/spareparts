@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import VehicleCategories, brands, partscategory, Address, Top_categories , Review, Cart
+from .models import VehicleCategories, brands, partscategory, Top_categories , Review, Cart
 
 
 User = get_user_model()
@@ -41,6 +41,11 @@ class VehicleCategoriesSerializer(serializers.ModelSerializer):
         model = VehicleCategories
         fields = '__all__'
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'name', 'full_name', 'phone_number', 'address_line', 'pincode', 'state', 'city']
+
 class BrandsSerializer(serializers.ModelSerializer):
     vehicle_Brand = serializers.CharField()
     is_car = serializers.BooleanField(default=True)
@@ -61,10 +66,7 @@ class PartsCategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class AddressSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Address
-        fields = '__all__'
+
 
 
 class TopCategorySerializer(serializers.ModelSerializer):

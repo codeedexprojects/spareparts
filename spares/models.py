@@ -31,6 +31,12 @@ class User(AbstractBaseUser):
     otp = models.CharField(max_length=32, blank=True, null=True)
     is_verified = models.BooleanField(default=False)
     otp_secret_key = models.CharField(max_length=32, blank=True, null=True)
+    full_name = models.CharField(max_length=255, blank=True,)
+    phone_number = models.CharField(max_length=20, blank=True,)
+    address_line = models.CharField(max_length=255,  blank=True,)
+    pincode = models.CharField(max_length=20, blank=True,)
+    state = models.CharField(max_length=100, blank=True,)
+    city = models.CharField(max_length=100, blank=True,)
 
 
 
@@ -83,17 +89,6 @@ class partscategory(models.Model):
 
 
 
-class Address(models.Model):
-    full_name = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=20)
-    address_line = models.CharField(max_length=255)
-    pincode = models.CharField(max_length=20)
-    state = models.CharField(max_length=100)
-    city = models.CharField(max_length=100)
-    other_details = models.TextField(blank=True)
-
-    def __str__(self):
-        return f"{self.full_name} - {self.address_line}, {self.city}, {self.state} - {self.pincode}"
     
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

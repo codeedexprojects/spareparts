@@ -36,9 +36,10 @@ urlpatterns = [
     path('parts_categories/filter/brand/<int:brand_id>/', views.PartsCategoryFilterByBrand.as_view(), name='parts_category_filter_by_brand'),
 
 
- # Address CRUD operations
-    path('addresses/', views.AddressListCreateView.as_view(), name='address_list_create'),
-    path('addresses/<int:pk>/', views.AddressDetailView.as_view(), name='address_detail'),
+ # Profile CRUD operations
+    path('profile/<int:id>/', views.UserProfileDetailView.as_view(), name='user-profile-detail'),
+    path('user-reg/', views.UserProfileCreateView.as_view(), name='user-register'),
+   
 
 #Top categories CRUD
 

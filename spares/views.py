@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics,permissions
 from rest_framework.permissions import AllowAny
 from .serializers import UserProfileSerializer,VerifyOTPSerializer,VehicleCategoriesSerializer, BrandsSerializer,\
-      PartsCategorySerializer, AddressSerializer, TopCategorySerializer , ReviewSerializer, CartSerializer  
+      PartsCategorySerializer, TopCategorySerializer , ReviewSerializer, CartSerializer ,UserSerializer
 from django.contrib.auth import get_user_model
 import random
 from django.core.mail import send_mail
@@ -15,7 +15,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.exceptions import AuthenticationFailed
 import datetime
 import jwt
-from .models import VehicleCategories,brands,partscategory,Address,Top_categories,Review,Cart
+from .models import VehicleCategories,brands,partscategory,Top_categories,Review,Cart
 
 
 
@@ -74,6 +74,16 @@ def verify(request):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
+class UserProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'id'
+
+class UserProfileCreateView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
 
 class LoginView(APIView):
     def post(self, request):
@@ -178,13 +188,6 @@ class PartsCategoryFilterByBrand(generics.ListAPIView):
     
 #address   
 
-class AddressListCreateView(generics.ListCreateAPIView):
-    queryset = Address.objects.all()
-    serializer_class = AddressSerializer
-
-class AddressDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Address.objects.all()
-    serializer_class = AddressSerializer
 
 #Categories
 
