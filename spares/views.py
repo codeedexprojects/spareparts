@@ -214,40 +214,31 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
 #cart
 
 class AddToCartView(APIView):
-    def post(self, request, user_id, product_id):
-        # Get the user and product objects
+    def post(self, request, user_id, parts_id):
         user = get_object_or_404(User, pk=user_id)
-        product = get_object_or_404(partscategory, pk=product_id)
+        part = get_object_or_404(partscategory, pk=parts_id)
 
-        # Create or update the cart item
-        cart_item, created = Cart.objects.get_or_create(user=user, product=product)
+        cart_item, created = Cart.objects.get_or_create(user=user, part=part)
 
-        # Update the quantity
         if not created:
             cart_item.quantity += 1
             cart_item.save()
 
-        # Pass request object to serializer context
         serializer = CartSerializer(cart_item, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    
+
+
+
 
 class UserCartView(APIView):
     def get(self, request, user_id):
-        # Retrieve the cart items of the user
         cart_items = Cart.objects.filter(user_id=user_id)
-
-        # Calculate the total price for each cart item and the total cart price
         total_cart_price = 0
         for cart_item in cart_items:
-            cart_item.total_price = cart_item.quantity * cart_item.product.Offer_Price
+            cart_item.total_price = cart_item.quantity * cart_item.part.price
             total_cart_price += cart_item.total_price
-
-        # Serialize the cart items with the total price
         serializer = CartSerializer(cart_items, context={'request': request}, many=True)
-
-        # Add the total cart price to the response data
         response_data = {
             'message': 'Products Retrieved Successfully',
             'cart_items': serializer.data,
@@ -275,9 +266,6 @@ class DeleteCartItemView(APIView):
         cart_item = get_object_or_404(Cart, pk=cart_item_id, user_id=user_id)
         cart_item.delete()
         cart_items = Cart.objects.filter(user_id=user_id)
-
-        # Serialize the cart items with their associated product images
-
         response_data = {
             'message': 'Removed From Cart Successfully',
             'status':True
@@ -286,7 +274,6 @@ class DeleteCartItemView(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
- #filter by vehicle & top categories   
     
 class PartsCategoryFilterByVehicleType(generics.ListAPIView):
     serializer_class = PartsCategorySerializer

@@ -57,6 +57,11 @@ urlpatterns = [
     path('reviews/<int:pk>/', views.ReviewDetailView.as_view(), name='review-detail'),
 
 #cart
+
+    path('add-to-cart/<int:user_id>/<int:parts_id>', views.AddToCartView.as_view(), name='cart-add-product'),
+    path('view-cart/<int:user_id>/', views.UserCartView.as_view(), name='user_cart'),
+    path('update-cart/<int:user_id>/<int:cart_item_id>/', views.UpdateCartView.as_view(), name='update_cart'),
+    path('delete-cart-item/<int:user_id>/<int:cart_item_id>/', views.DeleteCartItemView.as_view(), name='delete_cart_item'),
    
     
 #Filter by car/ike
