@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
 from rest_framework.exceptions import AuthenticationFailed
 import datetime
+from django.db import transaction
 import jwt
 from .models import VehicleCategories,brands,partscategory,Top_categories,Review,Cart
 
@@ -251,10 +252,17 @@ class UpdateCartView(APIView):
     def put(self, request, user_id, cart_item_id):
         cart_item = get_object_or_404(Cart, pk=cart_item_id, user_id=user_id)
         serializer = CartSerializer(cart_item, data=request.data)
+        cart_items = Cart.objects.filter(user_id=user_id)
+        total_cart_price = 0
+        for cart_item in cart_items:
+            cart_item.total_price = cart_item.quantity * cart_item.part.price
+            total_cart_price += cart_item.total_price
         if serializer.is_valid():
             serializer.save()
             response_data = {
             'message': 'Updated Cart Successfully',
+            'cart_items': serializer.data,
+            'total_cart_price': total_cart_price,
             'status':True
         }
 
@@ -289,3 +297,30 @@ class PartsCategoryFilterByTopCategories(generics.ListAPIView):
         parts_Cat = self.kwargs['parts_Cat']
         return partscategory.objects.filter(parts_Cat=parts_Cat)
 
+
+class CheckoutView(generics.ListCreateAPIView):
+    serializer_class = CartSerializer
+    queryset = Cart.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        user_id = self.kwargs.get('user_id')
+        cart_id = self.kwargs.get('cart_id')
+
+        try:
+            with transaction.atomic():
+                total_price = 0
+                cart_items = Cart.objects.filter(user_id=user_id, id=cart_id)
+
+                if not cart_items.exists():
+                    return Response({'error': 'Cart not found'}, status=status.HTTP_404_NOT_FOUND)
+
+                # Calculate total price and delete cart items
+                for cart_item in cart_items:
+                    product = cart_item.part
+                    total_price += product.price * cart_item.quantity
+                    cart_item.delete()
+
+                # Return the total price
+                return Response({'message': 'Checkout successful', 'total_price': total_price}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

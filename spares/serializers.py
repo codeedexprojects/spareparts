@@ -85,4 +85,10 @@ class CartSerializer(serializers.ModelSerializer):
 
     def get_part(self, obj):
         return PartsCategorySerializer(obj.part, context=self.context).data
+    
+
+class CheckoutSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField()
+    cart_id = serializers.IntegerField()
+    total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
 

@@ -71,4 +71,7 @@ urlpatterns = [
 #Filter by Top-Categories
 
     path('Top_categories/filter/<int:parts_Cat>/', views.PartsCategoryFilterByTopCategories.as_view(), name='parts_category_filter_by_TOP_Cat'),
+
+#checkout 
+    path('checkout/<int:user_id>/<int:cart_id>/', views.CheckoutView.as_view(), name='checkout'),
 ]
