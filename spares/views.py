@@ -252,19 +252,24 @@ class UpdateCartView(APIView):
     def put(self, request, user_id, cart_item_id):
         cart_item = get_object_or_404(Cart, pk=cart_item_id, user_id=user_id)
         serializer = CartSerializer(cart_item, data=request.data)
-        cart_items = Cart.objects.filter(user_id=user_id)
-        total_cart_price = 0
-        for cart_item in cart_items:
-            cart_item.total_price = cart_item.quantity * cart_item.part.price
-            total_cart_price += cart_item.total_price
+
+        # Calculate the price for the specific cart item
+        cart_price = cart_item.quantity * cart_item.part.price if cart_item.part.price else 0
+
         if serializer.is_valid():
             serializer.save()
+
+            # Calculate the total cart price
+            cart_items = Cart.objects.filter(user_id=user_id)
+            total_cart_price = sum(item.quantity * item.part.price for item in cart_items if item.part.price)
+
             response_data = {
-            'message': 'Updated Cart Successfully',
-            'cart_items': serializer.data,
-            'total_cart_price': total_cart_price,
-            'status':True
-        }
+                'message': 'Updated Cart Successfully',
+                'cart_items': serializer.data,
+                'total_cart_price': total_cart_price,
+                'cart_price': cart_price,
+                'status': True
+            }
 
             return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
