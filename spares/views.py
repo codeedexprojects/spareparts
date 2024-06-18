@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics,permissions
 from rest_framework.permissions import AllowAny
 from .serializers import UserProfileSerializer,VerifyOTPSerializer,VehicleCategoriesSerializer, BrandsSerializer,\
-      PartsCategorySerializer, TopCategorySerializer , ReviewSerializer, CartSerializer ,UserSerializer
+      PartsCategorySerializer, TopCategorySerializer , ReviewSerializer, CartSerializer ,UserSerializer, OrderSerializer
 from django.contrib.auth import get_user_model
 import random
 from django.core.mail import send_mail
@@ -16,7 +16,7 @@ from rest_framework.exceptions import AuthenticationFailed
 import datetime
 from django.db import transaction
 import jwt
-from .models import VehicleCategories,brands,partscategory,Top_categories,Review,Cart
+from .models import VehicleCategories,brands,partscategory,Top_categories,Review,Cart,Order
 
 
 
@@ -303,29 +303,37 @@ class PartsCategoryFilterByTopCategories(generics.ListAPIView):
         return partscategory.objects.filter(parts_Cat=parts_Cat)
 
 
-class CheckoutView(generics.ListCreateAPIView):
-    serializer_class = CartSerializer
-    queryset = Cart.objects.all()
-
-    def create(self, request, *args, **kwargs):
-        user_id = self.kwargs.get('user_id')
-        cart_id = self.kwargs.get('cart_id')
-
+class CheckoutView(APIView):
+    def post(self, request, user_id, cart_id):
         try:
             with transaction.atomic():
                 total_price = 0
-                cart_items = Cart.objects.filter(user_id=user_id, id=cart_id)
+                cart_item = get_object_or_404(Cart, user_id=user_id, id=cart_id)
 
-                if not cart_items.exists():
-                    return Response({'error': 'Cart not found'}, status=status.HTTP_404_NOT_FOUND)
+                # Calculate total price
+                product = cart_item.part
+                total_price += product.price * cart_item.quantity
 
-                # Calculate total price and delete cart items
-                for cart_item in cart_items:
-                    product = cart_item.part
-                    total_price += product.price * cart_item.quantity
-                    cart_item.delete()
+                # Create order
+                order = Order(
+                    user=cart_item.user,
+                    part=cart_item.part,
+                    quantity=cart_item.quantity,
+                    total_price=product.price * cart_item.quantity,
+                    status='Pending'
+                )
+                order.save()
 
-                # Return the total price
+                # Delete the cart item
+                cart_item.delete()
+
                 return Response({'message': 'Checkout successful', 'total_price': total_price}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class MyOrdersView(generics.ListAPIView):
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        return Order.objects.filter(user_id=user_id).order_by('-ordered_at')

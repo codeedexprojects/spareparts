@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import VehicleCategories, brands, partscategory, Top_categories , Review, Cart
+from .models import VehicleCategories, brands, partscategory, Top_categories , Review, Cart, Order
 
 
 User = get_user_model()
@@ -92,3 +92,10 @@ class CheckoutSerializer(serializers.Serializer):
     cart_id = serializers.IntegerField()
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
 
+class OrderSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+    part = PartsCategorySerializer()
+
+    class Meta:
+        model = Order
+        fields = ['id', 'user', 'part', 'quantity', 'total_price', 'ordered_at', 'status']

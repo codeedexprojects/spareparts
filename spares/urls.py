@@ -74,4 +74,7 @@ urlpatterns = [
 
 #checkout 
     path('checkout/<int:user_id>/<int:cart_id>/', views.CheckoutView.as_view(), name='checkout'),
+
+    path('my-orders/<int:user_id>/', views.MyOrdersView.as_view(), name='my-orders'),
+
 ]
