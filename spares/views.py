@@ -2,7 +2,8 @@ from django.shortcuts import render
 from rest_framework import generics,permissions
 from rest_framework.permissions import AllowAny
 from .serializers import UserProfileSerializer,VerifyOTPSerializer,VehicleCategoriesSerializer, BrandsSerializer,\
-      PartsCategorySerializer, TopCategorySerializer , ReviewSerializer, CartSerializer ,UserSerializer, OrderSerializer
+      PartsCategorySerializer, TopCategorySerializer , ReviewSerializer, CartSerializer ,UserSerializer, OrderSerializer,\
+      UserAddressSerializer
 from django.contrib.auth import get_user_model
 import random
 from django.core.mail import send_mail
@@ -356,3 +357,12 @@ class PartCategorySearchView(generics.ListAPIView):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response({'results': serializer.data})
+    
+
+class UserAddressView(generics.RetrieveAPIView):
+    serializer_class = UserAddressSerializer
+
+    def get(self, request, user_id):
+        user = get_object_or_404(User, id=user_id)
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)

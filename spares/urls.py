@@ -81,4 +81,8 @@ urlpatterns = [
 #search products
     path('search/', views.PartCategorySearchView.as_view(), name='product_search'),
 
+#adrees 
+    path('address/<int:user_id>/', views.UserAddressView.as_view(), name='adresss'),
+
+
 ]

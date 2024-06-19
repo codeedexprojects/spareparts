@@ -100,3 +100,8 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ['id', 'user', 'part', 'quantity', 'total_price', 'ordered_at', 'status']
 
+
+class UserAddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['address_line']
