@@ -75,6 +75,10 @@ urlpatterns = [
 #checkout 
     path('checkout/<int:user_id>/<int:cart_id>/', views.CheckoutView.as_view(), name='checkout'),
 
+#my orders
     path('my-orders/<int:user_id>/', views.MyOrdersView.as_view(), name='my-orders'),
+
+#search products
+    path('search/', views.PartCategorySearchView.as_view(), name='product_search'),
 
 ]

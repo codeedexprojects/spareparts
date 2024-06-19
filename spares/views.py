@@ -16,6 +16,7 @@ from rest_framework.exceptions import AuthenticationFailed
 import datetime
 from django.db import transaction
 import jwt
+from django.db.models import Q
 from .models import VehicleCategories,brands,partscategory,Top_categories,Review,Cart,Order
 
 
@@ -337,3 +338,21 @@ class MyOrdersView(generics.ListAPIView):
     def get_queryset(self):
         user_id = self.kwargs['user_id']
         return Order.objects.filter(user_id=user_id).order_by('-ordered_at')
+
+
+class PartCategorySearchView(generics.ListAPIView):
+    serializer_class = PartsCategorySerializer
+
+    def get_queryset(self):
+        search_query = self.request.query_params.get('search_query', None)
+        if search_query:
+            return partscategory.objects.filter(
+                Q(parts_name__icontains=search_query) | 
+                Q(description__icontains=search_query)
+            )
+        return partscategory.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({'results': serializer.data})
